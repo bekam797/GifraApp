@@ -1,23 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ImageItem from './ImageItem';
+import InitialContext from '../context/InitialContext';
 
-const Items = ({item, setSelectedImg, imgId, setImgId}) => {
+const Items = ({item, imgId, setImgId}) => {
   const navigation = useNavigation();
+  const {handleGetImges} = useContext(InitialContext);
 
   if (item.id === imgId) {
-    setSelectedImg(item);
+    handleGetImges(item);
   }
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Details', {
-          params: {
-            itemObj: setSelectedImg,
-          },
-        });
+        navigation.navigate('Details');
         setImgId(item.id);
       }}
       style={styles.root}>

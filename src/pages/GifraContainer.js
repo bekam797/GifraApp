@@ -1,18 +1,19 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {StyleSheet, View, Text, ActivityIndicator} from 'react-native';
 import axios from 'axios';
 import Header from '../components/Header';
 import FlatComponent from '../components/FlatComponent';
+import InitialContext from '../context/InitialContext';
 
 const API_KEY = 'SSK25JIcl9G3XhS8iRuJ3dLPeHvMXqO9';
-const LIMIT = 4;
+let LIMIT = 10;
 
 const GifraContainer = () => {
   const [data, setData] = useState([]);
   const [textValue, setTextValue] = useState('');
   const [imgId, setImgId] = useState(null);
-  const [selectedImg, setSelectedImg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const {handleSaveData} = useContext(InitialContext);
 
   useEffect(() => {
     setIsLoading(true);
@@ -28,6 +29,7 @@ const GifraContainer = () => {
         console.log('ressssss:', res.data.data.length);
         if (res.data.data.length > 0) {
           setData(res.data.data);
+          handleSaveData(res.data.data);
         }
         setIsLoading(false);
       } catch (error) {
@@ -35,13 +37,14 @@ const GifraContainer = () => {
       }
     };
     fetchData();
-  }, [textValue]);
+  }, [textValue, handleSaveData]);
 
-  // console.log('img Idddd', selectedImgId);
-  // console.log('selectedImg: ', selectedImg);
+  const handleLoadMore = () => {
+    if (isLoading) {
+      LIMIT += 1;
+    }
+  };
 
-  // console.log('data: ', data);
-  console.log(data?.length === 0, ':::data?.length === 0 ');
   return (
     <View>
       <Header textValue={textValue} setTextValue={setTextValue} />
@@ -57,13 +60,7 @@ const GifraContainer = () => {
             </Text>
           </View>
         ) : (
-          <FlatComponent
-            data={data}
-            setSelectedImg={setSelectedImg}
-            imgId={imgId}
-            setImgId={setImgId}
-            selectedImg={selectedImg}
-          />
+          <FlatComponent data={data} imgId={imgId} setImgId={setImgId} />
         )}
       </View>
     </View>

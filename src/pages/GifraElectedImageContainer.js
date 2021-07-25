@@ -1,92 +1,90 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import React, {useState, useContext, useEffect} from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  RefreshControl,
+} from 'react-native';
 import FlatComponent from '../components/FlatComponent';
 import ImageItem from '../components/ImageItem';
 import {useNavigation} from '@react-navigation/native';
 import BackIcon from '../icons/Back.svg';
 import EyeIcon from '../icons/Eye.svg';
+import InitialContext from '../context/InitialContext';
+
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
 
 const GifraElectedImageContainer = props => {
-  const [textValue, setTextValue] = useState('');
   const [imgId, setImgId] = useState(null);
-  const [selectedImg, setSelectedImg] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [filteredData, setfilteredDAta] = useState(false);
   const navigation = useNavigation();
+  const {imgDetailsObj, searchData} = useContext(InitialContext);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  const url =
-    'https://media3.giphy.com/media/13borq7Zo2kulO/200.gif?cid=a40b805djevrzwf15k4kki8rowbf9fxv6275e65y0jrwyghq&rid=200.gif&ct=g';
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
-  // Dummy Data
-  const data = [
-    {
-      images: {
-        fixed_height: {
-          url: 'https://media3.giphy.com/media/13borq7Zo2kulO/200.gif?cid=a40b805djevrzwf15k4kki8rowbf9fxv6275e65y0jrwyghq&rid=200.gif&ct=g',
-        },
-      },
-    },
-    {
-      images: {
-        fixed_height: {
-          url: 'https://media3.giphy.com/media/13borq7Zo2kulO/200.gif?cid=a40b805djevrzwf15k4kki8rowbf9fxv6275e65y0jrwyghq&rid=200.gif&ct=g',
-        },
-      },
-    },
-    {
-      images: {
-        fixed_height: {
-          url: 'https://media3.giphy.com/media/13borq7Zo2kulO/200.gif?cid=a40b805djevrzwf15k4kki8rowbf9fxv6275e65y0jrwyghq&rid=200.gif&ct=g',
-        },
-      },
-    },
-    {
-      images: {
-        fixed_height: {
-          url: 'https://media3.giphy.com/media/13borq7Zo2kulO/200.gif?cid=a40b805djevrzwf15k4kki8rowbf9fxv6275e65y0jrwyghq&rid=200.gif&ct=g',
-        },
-      },
-    },
-  ];
+  useEffect(() => {
+    let filterdData = searchData.filter(item => item.id !== imgDetailsObj.id);
+    setfilteredDAta(filterdData);
+  }, [searchData, imgDetailsObj.id]);
 
   return (
     <View style={styles.root}>
-      <View style={styles.imgContainer}>
-        <ImageItem url={url} stylesProp={styles.img} />
-        <View style={styles.photoView}>
-          <EyeIcon />
-          <Text style={styles.photoViewText}>12,032 views</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.buttonContainer}
-          onPress={() => navigation.goBack()}>
-          <View style={styles.buttun}>
-            <BackIcon />
+      <SafeAreaView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <View style={styles.imgContainer}>
+            <ImageItem
+              url={imgDetailsObj?.images?.fixed_height?.url}
+              stylesProp={styles.img}
+            />
+            <View style={styles.photoView}>
+              <EyeIcon />
+              <Text style={styles.photoViewText}>12,032 views</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={() => navigation.goBack()}>
+              <View style={styles.buttun}>
+                <BackIcon />
+              </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>BM</Text>
-        </View>
-        <View style={styles.userContainer}>
-          <Text style={styles.userName}>Beka</Text>
-          <Text style={styles.displayName}>@Beka12</Text>
-          {/* <Text style={styles.userName}>
-              {item.username !== '' ? item.username : 'UserName'}
-            </Text>
-            <Text style={styles.displayName}>{`${
-              item.username !== '' ? `@${item.username}` : '@UserName'
-            }`}</Text> */}
-        </View>
-      </View>
-      <Text style={styles.text}>Related GIFs</Text>
-      <FlatComponent
-        data={data}
-        setSelectedImg={setSelectedImg}
-        imgId={imgId}
-        setImgId={setImgId}
-        selectedImg={selectedImg}
-      />
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>UN</Text>
+            </View>
+            <View style={styles.userContainer}>
+              <Text style={styles.userName}>
+                {imgDetailsObj?.username !== ''
+                  ? imgDetailsObj?.username
+                  : 'UserName'}
+              </Text>
+              <Text style={styles.displayName}>{`${
+                imgDetailsObj?.username !== ''
+                  ? `@${imgDetailsObj?.username}`
+                  : '@UserName'
+              }`}</Text>
+            </View>
+          </View>
+          <Text style={styles.text}>Related GIFs</Text>
+          <FlatComponent
+            data={filteredData.length && filteredData}
+            imgId={imgId}
+            setImgId={setImgId}
+          />
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };

@@ -5,6 +5,7 @@ import GifraContainer from './src/pages/GifraContainer';
 import GifraElectedImageContainer from './src/pages/GifraElectedImageContainer';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {AuthProvider} from './src/context/InitialContext';
 
 const THEME_COLOR = '#000000';
 const Stack = createStackNavigator();
@@ -20,21 +21,23 @@ const MyTheme = {
 const App = () => {
   return (
     <>
-      <SafeAreaView style={styles.SafeArea}>
-        <StatusBar barStyle="light-content" />
-        <NavigationContainer theme={MyTheme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}>
-            <Stack.Screen name="Home" component={GifraContainer} />
-            <Stack.Screen
-              name="Details"
-              component={GifraElectedImageContainer}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
+      <AuthProvider>
+        <SafeAreaView style={styles.SafeArea}>
+          <StatusBar barStyle="light-content" />
+          <NavigationContainer theme={MyTheme}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}>
+              <Stack.Screen name="Home" component={GifraContainer} />
+              <Stack.Screen
+                name="Details"
+                component={GifraElectedImageContainer}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+      </AuthProvider>
     </>
   );
 };
