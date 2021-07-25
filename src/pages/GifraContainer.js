@@ -26,7 +26,6 @@ const GifraContainer = () => {
           }&limit=${LIMIT}&api_key=${API_KEY}`,
         );
 
-        console.log('ressssss:', res.data.data.length);
         if (res.data.data.length > 0) {
           setData(res.data.data);
           handleSaveData(res.data.data);
@@ -38,12 +37,6 @@ const GifraContainer = () => {
     };
     fetchData();
   }, [textValue, handleSaveData]);
-
-  const handleLoadMore = () => {
-    if (isLoading) {
-      LIMIT += 1;
-    }
-  };
 
   return (
     <View>
